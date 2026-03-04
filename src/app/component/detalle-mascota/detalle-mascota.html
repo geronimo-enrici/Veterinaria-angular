@@ -1,142 +1,171 @@
 <div class="spinner-container-global" *ngIf="loading">
   <div class="spinner"></div>
-  <p>Cargando mascota...</p>
+  <p>Accediendo al Expediente Clínico...</p>
 </div>
 
 <div class="main-layout" *ngIf="!loading && mascota">
-  <div class="card-container">
-    <div class="header-actions">
-      <button class="btn-back" routerLink="/duenos">← Volver</button>
-      <button class="btn-edit" (click)="toggleEdit()">
-        {{ editando ? '✖ Cancelar' : '✎ Editar Mascota' }}
+  <div class="content-wrapper">
+    
+    <div class="top-nav">
+      <button class="btn-action" routerLink="/duenos">← Volver</button>
+      <div class="nav-title">
+        <h1>EXPEDIENTE MÉDICO DIGITAL</h1>
+      </div>
+      <button class="btn-action" (click)="toggleEdit()">
+        {{ editando ? 'Cancelar' : 'Editar Ficha' }}
       </button>
     </div>
 
-    <div class="pet-card">
+    <div class="medical-grid">
       
-      <div *ngIf="editando" class="edit-form fade-in">
-        <div class="avatar-circle">{{ mascota.nombre?.charAt(0) | uppercase }}</div>
-        <input [(ngModel)]="mascota.nombre" placeholder="Nombre" class="edit-input">
-        <input [(ngModel)]="mascota.raza" placeholder="Raza" class="edit-input">
-        
-        <div class="stats-row">
-          <div class="stat">
-            <label>Edad</label>
-            <input type="number" [(ngModel)]="mascota.edad" class="edit-input" id="edit-input1">
+      <aside class="left-column">
+        <section class="patient-card">
+          <div class="patient-avatar">{{ mascota.nombre?.charAt(0) }}</div>
+          <h2 class="patient-name">{{ mascota.nombre }}</h2>
+          <div class="patient-specs">
+            <span>{{ mascota.especie }}</span>
+            <span class="divider">|</span>
+            <span>{{ mascota.raza }}</span>
           </div>
-          <div class="stat">
-            <label>Peso</label>
-            <input type="number" [(ngModel)]="mascota.peso" class="edit-input" id="edit-input1">
-          </div>
-        </div>
-        
-        <button class="btn-save" (click)="guardarCambios()" [disabled]="cargandoGuardar">
-          {{ cargandoGuardar ? 'Guardando...' : '💾 Guardar Cambios' }}
-        </button>
-      </div>
-
-      <div *ngIf="!editando" class="view-mode fade-in dashboard-grid">
-        
-        <div class="profile-section">
-          <div class="avatar-circle">{{ mascota.nombre?.charAt(0) | uppercase }}</div>
-          <h1 class="title">{{ mascota.nombre }}</h1>
-          <span class="raza-tag">{{ mascota.raza }}</span>
-
-          <div class="stats-container">
-            <div class="stat-box">
-              <span class="stat-label">Edad</span>
-              <span class="stat-value">{{ mascota.edad }} <small>años</small></span>
+          <div class="vital-stats">
+            <div class="vital-box">
+              <label>Edad</label>
+              <strong>{{ mascota.edad }} años</strong>
             </div>
-            <div class="stat-box">
-              <span class="stat-label">Peso</span>
-              <span class="stat-value">{{ mascota.peso }} <small>kg</small></span>
+            <div class="vital-box">
+              <label>Peso</label>
+              <strong>{{ mascota.peso }} kg</strong>
             </div>
           </div>
+        </section>
 
-          <div class="ai-box">
-            <h3 class="ai-header">✨ Biografía Gemini</h3>
-            <div *ngIf="cargandoIA" class="spinner-mini-container">
-              <div class="spinner-small"></div>
-            </div>
-            <p *ngIf="!cargandoIA" class="ai-content">{{ descripcionIA }}</p>
-          </div>
-        </div>
-
-        <div class="vacunas-section">
-          <h3 class="section-subtitle">💉 Historial de Vacunas</h3>
-          <div class="vacunas-list">
-            <div *ngFor="let item of plan" class="vacuna-card" [ngClass]="item.aplicada ? 'is-aplicada' : 'is-pendiente'">
-              
-              <ng-container *ngIf="vacunaEditando?.vacunaId !== item.vacunaId">
-                <div class="vacuna-info">
-                  <span class="vacuna-nombre">{{ item.nombreVacuna }}</span>
-                  <span class="vacuna-fecha">
-                    {{ item.fecha ? (item.fecha | date:'dd/MM/yyyy') : 'Sin fecha' }}
-                  </span>
-                </div>
-                <div class="vacuna-badge-container">
-                  <span class="badge" [ngClass]="item.aplicada ? 'badge-green' : 'badge-red'">
-                    {{ item.aplicada ? '✔ Aplicada' : '⌛ Pendiente' }}
-                  </span>
-                  <button class="btn-icon" (click)="iniciarEdicionVacuna(item)">✏️</button>
-                </div>
-              </ng-container>
-
-              <ng-container *ngIf="vacunaEditando?.vacunaId === item.vacunaId">
-                <div class="vacuna-edit-mode">
-                  <div class="vacuna-edit-controls">
-                    <input type="checkbox" [(ngModel)]="vacunaEditando.aplicada">
-                    <input type="date" [(ngModel)]="vacunaEditando.fecha" class="edit-input date-small">
-                  </div>
-                  <div class="vacuna-edit-actions">
-                    <button class="btn-save-sm" (click)="guardarVacuna()">✔</button>
-                    <button class="btn-cancel-sm" (click)="cancelarEdicionVacuna()">✖</button>
-                  </div>
-                </div>
-              </ng-container>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="columna-derecha">
-          
-          <div class="turnos-section">
-            <h3 class="section-subtitle">📅 Próximos Turnos</h3>
-            
-            <div *ngIf="proximosTurnos.length === 0" class="empty-turnos">
-              <p>No hay turnos programados.</p>
-            </div>
-
-            <div class="turnos-list" *ngIf="proximosTurnos.length > 0">
-              <div *ngFor="let turno of proximosTurnos" class="turno-card">
-                <div class="turno-icon">
-                  <span *ngIf="turno.tipo === 'Veterinaria'">🩺</span>
-                  <span *ngIf="turno.tipo === 'Peluqueria'">✂️</span>
-                  <span *ngIf="turno.tipo === 'Vacunacion'">💉</span>
-                  <span *ngIf="turno.tipo === 'Cirugia'">🏥</span>
-                  <span *ngIf="turno.tipo === 'Chequeo'">📋</span>
-                </div>
-                <div class="turno-info">
-                  <span class="turno-tipo">{{ turno.tipo }}</span>
-                  <span class="turno-fecha">{{ turno.fechaHora | date:'dd/MM/yyyy - HH:mm' }} hs</span>
-                </div>
+        <section class="side-panel-section">
+          <h3>💉 VACUNACIÓN</h3>
+          <div class="mini-list">
+            <div *ngFor="let v of plan" class="mini-entry" [class.applied]="v.aplicada">
+              <div class="entry-status"></div>
+              <div class="entry-details">
+                <p class="entry-name">{{ v.nombreVacuna }}</p>
+                <p class="entry-date">{{ v.fecha | date:'dd/MM/yyyy' }}</p>
               </div>
             </div>
           </div>
+        </section>
 
-          <div class="historial-clinico-section">
-            <h3 class="section-subtitle">📚 Historial Clínico</h3>
-            <div class="historial-placeholder">
-              <span class="historial-icon">📂</span>
-              <p>El historial de consultas médicas y procedimientos aparecerá aquí.</p>
-              <small>(Próximamente)</small>
+        <section class="side-panel-section">
+          <h3>📅 CITAS PROGRAMADAS</h3>
+          <div class="mini-list">
+            <div *ngFor="let t of proximosTurnos" class="mini-entry appointment">
+              <div class="entry-details">
+                <p class="entry-name">{{ t.tipo }}</p>
+                <p class="entry-date">{{ t.fechaHora | date:'dd/MM - HH:mm' }} hs</p>
+              </div>
             </div>
           </div>
+          <p class="empty-msg" *ngIf="proximosTurnos.length === 0">No hay turnos próximos.</p>
+        </section>
+      </aside>
 
-        </div>
+      <main class="center-column">
+        <section class="evolution-composer" *ngIf="!editando">
+          <div class="section-header">
+            <h2>NUEVA EVOLUCIÓN</h2>
+          </div>
+          <div class="composer-card">
+            <div class="composer-row">
+              <div class="composer-field">
+                <label>Motivo de Consulta</label>
+                <input [(ngModel)]="nuevaConsulta.motivo" placeholder="Ej: Control post-operatorio">
+              </div>
+              <div class="composer-field weight">
+                <label>Peso Actual</label>
+                <input type="number" [(ngModel)]="nuevaConsulta.peso">
+              </div>
+            </div>
+            <div class="composer-field">
+              <label>Diagnóstico y Hallazgos</label>
+              <textarea [(ngModel)]="nuevaConsulta.diagnostico" rows="4" placeholder="Describa el estado del paciente..."></textarea>
+            </div>
+            <div class="composer-field">
+              <label>Tratamiento / Indicaciones</label>
+              <textarea [(ngModel)]="nuevaConsulta.tratamiento" rows="2" placeholder="Dosis, medicamentos, dieta..."></textarea>
+            </div>
+            <div class="composer-footer">
+              <button class="btn-submit" (click)="registrarConsulta()">Registrar Evolución Permanente</button>
+            </div>
+          </div>
+        </section>
 
-      </div>
+        <section class="history-feed" *ngIf="!editando">
+          <div class="section-header">
+            <h2>HISTORIA CLÍNICA CRONOLÓGICA</h2>
+          </div>
+          
+          <div class="evolution-stack">
+            <article *ngFor="let registro of historialClinico" class="clinical-block">
+              <div class="block-sidebar">
+                <div class="block-date">
+                  <span class="day">{{ registro.fecha | date:'dd' }}</span>
+                  <span class="month">{{ registro.fecha | date:'MMM' }}</span>
+                </div>
+                <div class="block-weight">{{ registro.peso }} kg</div>
+              </div>
+              <div class="block-content">
+                <div class="block-header">
+                  <h3>{{ registro.motivo }}</h3>
+                  <span class="vet-name">Atendido por: {{ registro.veterinario }}</span>
+                </div>
+                <div class="block-body">
+                  <div class="body-section">
+                    <h4>DIAGNÓSTICO</h4>
+                    <p>{{ registro.diagnostico }}</p>
+                  </div>
+                  <div class="body-section highlight" *ngIf="registro.tratamiento">
+                    <h4>TRATAMIENTO E INDICACIONES</h4>
+                    <p>{{ registro.tratamiento }}</p>
+                  </div>
+                </div>
+              </div>
+            </article>
+            
+            <div class="no-history" *ngIf="historialClinico.length === 0">
+              <p>No existen registros en la base de datos para este paciente.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="edit-panel" *ngIf="editando">
+          <div class="section-header">
+            <h2>EDITAR DATOS MAESTROS</h2>
+          </div>
+          <div class="composer-card">
+            <div class="composer-row">
+              <div class="composer-field">
+                <label>Nombre</label>
+                <input [(ngModel)]="mascota.nombre">
+              </div>
+              <div class="composer-field">
+                <label>Especie</label>
+                <input [(ngModel)]="mascota.especie">
+              </div>
+            </div>
+            <div class="composer-row">
+              <div class="composer-field">
+                <label>Raza</label>
+                <input [(ngModel)]="mascota.raza">
+              </div>
+              <div class="composer-field">
+                <label>Edad</label>
+                <input type="number" [(ngModel)]="mascota.edad">
+              </div>
+            </div>
+            <div class="composer-footer">
+              <button class="btn-submit" (click)="guardarCambios()">Guardar Cambios</button>
+            </div>
+          </div>
+        </section>
+      </main>
+
     </div>
   </div>
 </div>

@@ -26,7 +26,8 @@ export class CalendarioTurnos implements OnInit {
   turnoForm = {
     mascotaNombre: '',
     fechaHora: '',
-    tipo: 'Veterinaria'
+    tipo: 'Veterinaria',
+    comentarios: ''
   };
 
   turnoSeleccionado: any = null;
@@ -74,31 +75,35 @@ export class CalendarioTurnos implements OnInit {
     });
   }
 
-cargarTurnos() {
-    this.http.get<any[]>('https://localhost:7082/api/turnos').subscribe(data => {
-      
-      const configTipos: { [key: string]: { duracionMs: number, color: string } } = {
-        'Veterinaria': { duracionMs: 3600000, color: '#3788d8' }, 
-        'Peluqueria':  { duracionMs: 7200000, color: '#ff9f89' }, 
-        'Vacunacion':  { duracionMs: 1800000, color: '#28a745' },
-        'Cirugia':     { duracionMs: 10800000, color: '#dc3545'},
-        'Chequeo':     { duracionMs: 1800000, color: '#6f42c1' } 
-      };
-
-      this.calendarOptions.events = data.map(t => {
-        const config = configTipos[t.tipo] || configTipos['Veterinaria'];
-        
-        return {
-          id: String(t.id),
-          title: t.mascotaNombre,
-          start: t.fechaHora,
-          end: new Date(new Date(t.fechaHora).getTime() + config.duracionMs).toISOString(),
-          backgroundColor: config.color,
-          extendedProps: { tipo: t.tipo, mascotaNombre: t.mascotaNombre }
+  cargarTurnos() {
+    this.http.get<any[]>('https://localhost:7082/api/turnos').subscribe({
+      next: (data) => {
+        const configTipos: { [key: string]: { duracionMs: number, color: string } } = {
+          'Veterinaria': { duracionMs: 3600000, color: '#3788d8' }, 
+          'Peluqueria':  { duracionMs: 7200000, color: '#ff9f89' }, 
+          'Vacunacion':  { duracionMs: 1800000, color: '#28a745' },
+          'Cirugia':     { duracionMs: 10800000, color: '#dc3545'},
+          'Chequeo':     { duracionMs: 1800000, color: '#6f42c1' } 
         };
-      });
-      
-      this.cdr.detectChanges();
+
+        this.calendarOptions.events = data.map(t => {
+          const config = configTipos[t.tipo] || configTipos['Veterinaria'];
+          return {
+            id: String(t.id),
+            title: t.mascotaNombre,
+            start: t.fechaHora,
+            end: new Date(new Date(t.fechaHora).getTime() + config.duracionMs).toISOString(),
+            backgroundColor: config.color,
+           extendedProps: { tipo: t.tipo, mascotaNombre: t.mascotaNombre }
+          };
+        });
+        this.cdr.detectChanges();
+      },
+     error: (err) => {
+        console.error("Error al cargar turnos:", err);
+        this.calendarOptions.events = [];
+        this.cdr.detectChanges();
+      }
     });
   }
 

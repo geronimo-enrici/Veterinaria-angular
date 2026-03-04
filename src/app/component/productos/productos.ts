@@ -1,8 +1,9 @@
-import { Component, OnInit, Inject, PLATFORM_ID, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID, ChangeDetectorRef, NgZone, viewChild, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Producto, ItemCarrito } from './models';
+import { ProductosService } from '../../service/productos';
 
 @Component({
   selector: 'app-productos',
@@ -43,6 +44,11 @@ export class Productos implements OnInit {
   mostrarFormularioCrear = false;
   creandoProducto = false;
   eliminandoId: number | null = null;
+
+  isUploadingExcel: boolean = false;
+  uploadMessage: string = '';
+  isDownloadingExcel: boolean = false;
+  @ViewChild('fileInput') fileInput!: ElementRef;
   
   nuevoProducto: Partial<Producto> = {
     nombre: '',
@@ -58,6 +64,7 @@ export class Productos implements OnInit {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private zone: NgZone, 
+    private productosService: ProductosService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -153,9 +160,6 @@ export class Productos implements OnInit {
 
   cambiarPagina(p: number) {
     this.paginaActual = p;
-    if (isPlatformBrowser(this.platformId)) {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
   }
 
   obtenerCantidadEnCarrito(id: number): number {
@@ -333,4 +337,58 @@ export class Productos implements OnInit {
       }
     });
   }
+
+onFileExcelSelected(event: any): void {
+  const file = event.target.files[0];
+  if (file) {
+    this.isUploadingExcel = true;
+    this.uploadMessage = '⏳ Sincronizando base de datos...';
+    
+    this.productosService.sincronizarExcel(file).subscribe({
+      next: (res: any) => {
+        this.isUploadingExcel = false;
+        
+        this.uploadMessage = `✅ ¡Éxito! Procesados: ${res.procesados} | Eliminados: ${res.eliminados}. Recargando...`;
+        
+        setTimeout(() => {
+          window.location.reload();
+        }, 3000);
+      },
+      error: (err) => {
+        this.isUploadingExcel = false;
+        this.uploadMessage = '❌ Error al subir el Excel.';
+        console.error('Detalle del error:', err);
+        setTimeout(() => this.uploadMessage = '', 5000);
+      }
+    });
+  }
+}
+
+descargarExcel(): void {
+  this.isDownloadingExcel = true;
+
+  this.productosService.descargarExcel().subscribe({
+    next: (blob: Blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Inventario_Productos.xlsx'; 
+      document.body.appendChild(a);
+      a.click();
+      
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      this.isDownloadingExcel = false;
+      this.uploadMessage = ''; 
+    },
+    error: (err) => {
+      this.isDownloadingExcel = false;
+      this.uploadMessage = '❌ Error al descargar';
+      console.error(err);
+      
+      setTimeout(() => this.uploadMessage = '', 3000);
+    }
+  });
+}
 }

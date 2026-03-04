@@ -132,7 +132,8 @@
 }
 
 .form-group select,
-.form-group input[type="datetime-local"] {
+.form-group input[type="datetime-local"],
+.form-group textarea {
     padding: 1rem;
     border: 2px solid #e2e8f0;
     border-radius: 10px;
@@ -143,10 +144,12 @@
     color: #1e293b;
     font-weight: 500;
     font-family: inherit;
+    resize: vertical;
 }
 
 .form-group select:focus,
-.form-group input[type="datetime-local"]:focus {
+.form-group input[type="datetime-local"]:focus,
+.form-group textarea:focus {
     border-color: #3788d8;
     background-color: #ffffff;
     box-shadow: 0 0 0 3px rgba(55, 136, 216, 0.1);

@@ -1,130 +1,133 @@
-<div class="modal-overlay" *ngIf="mostrarModalLogin">
-  <div class="login-card">
-    <div class="modal-header">
-      <h3>Iniciar Sesión</h3>
-      <button class="btn-close-icon" (click)="mostrarModalLogin = false">✕</button>
-    </div>
-    
-    <div class="input-group">
-      <label>Correo Electrónico</label>
-      <input type="email" [(ngModel)]="loginEmail" placeholder="ejemplo@correo.com">
-    </div>
-    
-    <div class="input-group">
-      <label>Contraseña</label>
-      <input type="password" [(ngModel)]="loginPassword" placeholder="••••••••">
-    </div>
-
-    <p *ngIf="errorLogin" class="error-text">Datos incorrectos. Revisa la consola para más detalles.</p>
-    
-    <div class="modal-actions">
-      <button class="btn-cancel" (click)="mostrarModalLogin = false">Cancelar</button>
-      <button class="btn-confirmar" [disabled]="cargandoLogin" (click)="iniciarSesion()">
-        {{ cargandoLogin ? 'Cargando...' : 'Entrar' }}
-      </button>
-    </div>
-  </div>
-</div>
-
 <div class="store-layout">
   <div class="admin-panel-trigger" *ngIf="esAdmin && !modoAdmin">
     <button (click)="abrirPanelAdmin()">⚙️ Gestionar Stock e Inventario</button>
   </div>
 
-  <div class="admin-panel" *ngIf="modoAdmin">
-    <div class="admin-header">
-      <h2>📦 Panel de Control e Inventario</h2>
-      <div class="admin-header-actions">
-        <button class="btn-create-prod" (click)="toggleFormularioCrear()">
-          {{ mostrarFormularioCrear ? '✖ Cancelar' : '✨ Nuevo Producto' }}
-        </button>
-        <button class="btn-close-admin" (click)="modoAdmin = false">Volver a la Tienda</button>
-      </div>
-    </div>
+<div class="admin-panel" *ngIf="modoAdmin">
+  <div class="admin-header">
+    <h2>📦 Panel de Control e Inventario</h2>
     
-    <div class="create-prod-form fade-in" *ngIf="mostrarFormularioCrear">
-      <h3>Crear Nuevo Producto en la Base de Datos</h3>
-      <div class="form-grid">
-        <div class="input-group">
-          <label>Icono (Emoji)</label>
-          <input type="text" [(ngModel)]="nuevoProducto.icono" placeholder="Ej: 🦴">
-        </div>
-        <div class="input-group">
-          <label>Nombre del Producto</label>
-          <input type="text" [(ngModel)]="nuevoProducto.nombre" placeholder="Ej: Alimento Perro">
-        </div>
-        <div class="input-group">
-          <label>Categoría</label>
-          <select [(ngModel)]="nuevoProducto.categoria">
-            <option value="Comida">Comida</option>
-            <option value="Juguetes">Juguetes</option>
-            <option value="Accesorios">Accesorios</option>
-            <option value="Higiene">Higiene</option>
-            <option value="Farmacia">Farmacia</option>
-            <option value="Vacunas">Vacunas</option>
-          </select>
-        </div>
-        <div class="input-group">
-          <label>Precio ($)</label>
-          <input type="number" [(ngModel)]="nuevoProducto.precio" min="0">
-        </div>
-        <div class="input-group">
-          <label>Stock Inicial</label>
-          <input type="number" [(ngModel)]="nuevoProducto.stock" min="0">
-        </div>
-        <div class="input-group btn-group-align">
-          <button class="btn-save-new" (click)="crearProducto()" [disabled]="creandoProducto">
-            {{ creandoProducto ? 'Creando...' : '➕ Agregar Producto' }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <div class="admin-header-actions" style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+      
+      <span class="upload-message" *ngIf="uploadMessage && uploadMessage !== ''" style="font-size: 0.85rem; font-weight: 600; color: #475569; padding: 8px 12px; background: #f1f5f9; border-radius: 8px;">
+        {{ uploadMessage }}
+      </span>
 
-    <div class="admin-table-container">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Categoría</th>
-            <th>Precio Actual / Nuevo</th>
-            <th>Stock Actual</th>
-            <th>Aumentar Stock</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let prod of todosLosProductos" [class.deleting]="eliminandoId === prod.id">
-            <td>
-              <div class="td-prod-info">
-                <span class="t-icon">{{ prod.icono }}</span> 
-                <span>{{ prod.nombre }}</span>
-              </div>
-            </td>
-            <td><span class="category-tag-sm">{{ prod.categoria }}</span></td>
-            <td>
-              <span class="currency-symbol">$</span>
-              <input type="number" min="0" step="0.01" class="input-precio" [(ngModel)]="nuevosPrecios[prod.id]">
-            </td>
-            <td><span class="badge-stock">{{ prod.stock }} un.</span></td>
-            <td>
-              <input type="number" min="0" class="input-stock" [(ngModel)]="ingresosStock[prod.id]" placeholder="0">
-            </td>
-            <td>
-              <button class="btn-delete-prod" (click)="eliminarProducto(prod.id)" [disabled]="eliminandoId === prod.id" title="Eliminar producto">
-                🗑️
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="admin-actions">
-      <button class="btn-save" [disabled]="guardandoStock" (click)="guardarNuevoStock()">
-        {{ guardandoStock ? 'Procesando...' : '💾 Guardar Cambios de Stock/Precio' }}
+      <button 
+        class="btn-create-prod" 
+        (click)="descargarExcel()" 
+        [disabled]="isDownloadingExcel || isUploadingExcel"
+        style="background: #3b82f6; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.2);">
+        {{ isDownloadingExcel ? '⏳ Bajando...' : '📥 Bajar Excel' }}
       </button>
+
+      <input 
+        type="file" 
+        #fileInput 
+        (change)="onFileExcelSelected($event)" 
+        accept=".xlsx, .xls" 
+        style="display: none;"
+      >
+
+      <button 
+        class="btn-create-prod btn-excel" 
+        (click)="fileInput.click()" 
+        [disabled]="isUploadingExcel || isDownloadingExcel"
+        style="background: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.2);">
+        {{ isUploadingExcel ? '⏳ Subiendo...' : '📤 Subir Excel' }}
+      </button>
+
+      <button class="btn-create-prod" (click)="toggleFormularioCrear()">
+        {{ mostrarFormularioCrear ? '✖ Cancelar' : '✨ Nuevo Producto' }}
+      </button>
+      
+      <button class="btn-close-admin" (click)="modoAdmin = false">Volver a la Tienda</button>
     </div>
   </div>
+  
+  <div class="create-prod-form fade-in" *ngIf="mostrarFormularioCrear">
+    <h3>Crear Nuevo Producto en la Base de Datos</h3>
+    <div class="form-grid">
+      <div class="input-group">
+        <label>Icono (Emoji)</label>
+        <input type="text" [(ngModel)]="nuevoProducto.icono" placeholder="Ej: 🦴">
+      </div>
+      <div class="input-group">
+        <label>Nombre del Producto</label>
+        <input type="text" [(ngModel)]="nuevoProducto.nombre" placeholder="Ej: Alimento Perro">
+      </div>
+      <div class="input-group">
+        <label>Categoría</label>
+        <select [(ngModel)]="nuevoProducto.categoria">
+          <option value="Comida">Comida</option>
+          <option value="Juguetes">Juguetes</option>
+          <option value="Accesorios">Accesorios</option>
+          <option value="Higiene">Higiene</option>
+          <option value="Farmacia">Farmacia</option>
+          <option value="Vacunas">Vacunas</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Precio ($)</label>
+        <input type="number" [(ngModel)]="nuevoProducto.precio" min="0">
+      </div>
+      <div class="input-group">
+        <label>Stock Inicial</label>
+        <input type="number" [(ngModel)]="nuevoProducto.stock" min="0">
+      </div>
+      <div class="input-group btn-group-align">
+        <button class="btn-save-new" (click)="crearProducto()" [disabled]="creandoProducto">
+          {{ creandoProducto ? 'Creando...' : '➕ Agregar Producto' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="admin-table-container">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Categoría</th>
+          <th>Precio Actual / Nuevo</th>
+          <th>Stock Actual</th>
+          <th>Aumentar Stock</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let prod of todosLosProductos" [class.deleting]="eliminandoId === prod.id">
+          <td>
+            <div class="td-prod-info">
+              <span class="t-icon">{{ prod.icono }}</span> 
+              <span>{{ prod.nombre }}</span>
+            </div>
+          </td>
+          <td><span class="category-tag-sm">{{ prod.categoria }}</span></td>
+          <td>
+            <span class="currency-symbol">$</span>
+            <input type="number" min="0" step="0.01" class="input-precio" [(ngModel)]="nuevosPrecios[prod.id]">
+          </td>
+          <td><span class="badge-stock">{{ prod.stock }} un.</span></td>
+          <td>
+            <input type="number" min="0" class="input-stock" [(ngModel)]="ingresosStock[prod.id]" placeholder="0">
+          </td>
+          <td>
+            <button class="btn-delete-prod" (click)="eliminarProducto(prod.id)" [disabled]="eliminandoId === prod.id" title="Eliminar producto">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <div class="admin-actions">
+    <button class="btn-save" [disabled]="guardandoStock" (click)="guardarNuevoStock()">
+      {{ guardandoStock ? 'Procesando...' : '💾 Guardar Cambios de Stock/Precio' }}
+    </button>
+  </div>
+</div>
 
   <div class="products-section" *ngIf="!modoAdmin">
     <div class="filters-bar">

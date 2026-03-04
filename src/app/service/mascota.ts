@@ -36,4 +36,11 @@ actualizarVacuna(idMascota: number, idVacuna: number, datos: any): Observable<an
 getDuenoDetalle(id: number): Observable<any> {
   return this.http.get(`https://localhost:7082/api/Duenos/${id}`);
 }
+getHistorial(mascotaId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/HistorialClinico/mascota/${mascotaId}`);
+  }
+
+  postHistorial(datos: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/HistorialClinico`, datos);
+  }
 }

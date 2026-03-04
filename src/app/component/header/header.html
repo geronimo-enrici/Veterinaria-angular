@@ -10,7 +10,7 @@
         <li><a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Mascotas</a></li>
         <li><a routerLink="/duenos" routerLinkActive="active">Dueños</a></li>
         <li><a routerLink="/productos" routerLinkActive="active">Productos</a></li>
-        <li ><a  routerLink="/turnos" routerLinkActive="active">Turnos</a></li>
+        <li><a routerLink="/turnos" routerLinkActive="active">Turnos</a></li>
       </ul>
     </nav>
 
@@ -23,3 +23,31 @@
     </div>
   </div>
 </header>
+
+<div class="modal-overlay" *ngIf="mostrarModalLogin">
+  <div class="login-card">
+    <div class="modal-header">
+      <h3>Iniciar Sesión</h3>
+      <button class="btn-close-icon" (click)="mostrarModalLogin = false">✕</button>
+    </div>
+    
+    <div class="input-group">
+      <label>Correo Electrónico</label>
+      <input type="email" [(ngModel)]="loginEmail" placeholder="ejemplo@correo.com">
+    </div>
+    
+    <div class="input-group">
+      <label>Contraseña</label>
+      <input type="password" [(ngModel)]="loginPassword" placeholder="••••••••">
+    </div>
+
+    <p *ngIf="errorLogin" class="error-text">Datos incorrectos.</p>
+    
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="mostrarModalLogin = false">Cancelar</button>
+      <button class="btn-confirmar" [disabled]="cargandoLogin" (click)="iniciarSesion()">
+        {{ cargandoLogin ? 'Cargando...' : 'Entrar' }}
+      </button>
+    </div>
+  </div>
+</div>

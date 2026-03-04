@@ -1,0 +1,301 @@
+.dashboard-container {
+    padding: 2rem;
+    background-color: #f4f7f6;
+    min-height: 100vh;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.main-title {
+    font-weight: 800;
+    color: #2c3e50;
+    margin: 0;
+    font-size: 2.2rem;
+}
+
+.subtitle {
+    color: #7f8c8d;
+    margin: 0;
+    font-size: 1rem;
+    margin-top: 0.3rem;
+}
+
+.legend-box {
+    display: flex;
+    gap: 1.5rem;
+    background: white;
+    padding: 0.8rem 1.5rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.legend-text {
+    font-weight: 600;
+    color: #34495e;
+    font-size: 0.95rem;
+}
+
+.color-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot-veterinaria { background-color: #3788d8; box-shadow: 0 0 8px rgba(55, 136, 216, 0.6); }
+.dot-peluqueria { background-color: #ff9f89; box-shadow: 0 0 8px rgba(255, 159, 137, 0.6); }
+.dot-vacunacion { background-color: #28a745; box-shadow: 0 0 8px rgba(40, 167, 69, 0.6); }
+.dot-cirugia { background-color: #dc3545; box-shadow: 0 0 8px rgba(220, 53, 69, 0.6); }
+.dot-chequeo { background-color: #6f42c1; box-shadow: 0 0 8px rgba(111, 66, 193, 0.6); }
+
+.dashboard-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.card-shadow {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    overflow: hidden;
+}
+
+.calendar-section {
+    padding: 1.5rem;
+}
+
+.form-section {
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    position: sticky;
+    top: 2rem;
+}
+
+.form-header h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2c3e50;
+    font-weight: 800;
+    font-size: 1.8rem;
+}
+
+.form-header .text-selected {
+    margin: 0;
+    color: #3788d8;
+    font-weight: 700;
+    font-size: 1.1rem;
+    background-color: #f0f7ff;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.bg-peluqueria-light {
+    color: #d9534f !important;
+    background-color: #fdf0ed !important;
+}
+
+.bg-veterinaria-light {
+    color: #3788d8 !important;
+    background-color: #f0f7ff !important;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-weight: 700;
+    color: #34495e;
+    font-size: 0.95rem;
+}
+
+.form-group select,
+.form-group input[type="datetime-local"] {
+    padding: 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+    background-color: #f8fafc;
+    color: #1e293b;
+    font-weight: 500;
+    font-family: inherit;
+}
+
+.form-group select:focus,
+.form-group input[type="datetime-local"]:focus {
+    border-color: #3788d8;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(55, 136, 216, 0.1);
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eef2f5;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    font-weight: 600;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    color: #2c3e50;
+    font-weight: 700;
+}
+
+.btn-submit {
+    background-color: #3788d8;
+    color: white;
+    border: none;
+    padding: 1.2rem;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.btn-submit:hover:not(:disabled) {
+    background-color: #2b6cb0;
+    transform: translateY(-2px);
+}
+
+.btn-submit:disabled {
+    background-color: #cbd5e1;
+    color: #94a3b8;
+    cursor: not-allowed;
+}
+
+.btn-delete {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: none;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+
+.btn-delete:hover {
+    background-color: #f87171;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: transparent;
+    color: #64748b;
+    border: 2px solid #cbd5e1;
+    padding: 1rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 0.5rem;
+}
+
+.btn-cancel:hover {
+    background-color: #f1f5f9;
+    color: #334155;
+}
+
+::ng-deep .fc {
+    --fc-border-color: #eef2f5;
+    --fc-button-bg-color: #ffffff;
+    --fc-button-border-color: #e2e8f0;
+    --fc-button-text-color: #475569;
+    --fc-button-hover-bg-color: #f8fafc;
+    --fc-button-hover-border-color: #cbd5e1;
+    --fc-button-active-bg-color: #e2e8f0;
+    --fc-today-bg-color: #f0f7ff;
+    font-size: 0.9rem;
+}
+
+::ng-deep .fc .fc-toolbar-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #1e293b;
+    text-transform: capitalize;
+}
+
+::ng-deep .fc-button-primary {
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    padding: 0.4rem 1rem !important;
+    transition: all 0.2s ease;
+}
+
+::ng-deep .fc-button-primary:focus {
+    box-shadow: none !important;
+}
+
+::ng-deep .fc-event {
+    border-radius: 6px;
+    border: none;
+    padding: 3px 5px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 90% !important; 
+    height: 90% !important;
+    margin: auto !important;
+}
+
+::ng-deep .fc-event:hover {
+    transform: scale(1.02);
+    filter: brightness(1.05);
+    z-index: 5 !important;
+}
+
+
+
+::ng-deep .fc-timegrid-event-harness-inset .fc-timegrid-event {
+    box-shadow: none;
+}
+
+@media (max-width: 992px) {
+    .dashboard-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-section {
+        position: static;
+        order: -1;
+    }
+}

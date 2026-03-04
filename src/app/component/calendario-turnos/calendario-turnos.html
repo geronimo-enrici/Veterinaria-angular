@@ -1,0 +1,96 @@
+<div class="dashboard-container">
+  <div class="dashboard-header">
+    <div class="header-titles">
+      <h2 class="main-title">📅 Agenda de Turnos</h2>
+      <p class="subtitle">Gestiona las citas médicas y de estética canina.</p>
+    </div>
+    
+    <div class="legend-box">
+      <div class="legend-item"><span class="color-dot dot-veterinaria"></span><span class="legend-text">Consulta (1h)</span></div>
+      <div class="legend-item"><span class="color-dot dot-peluqueria"></span><span class="legend-text">Peluquería (2h)</span></div>
+      <div class="legend-item"><span class="color-dot dot-vacunacion"></span><span class="legend-text">Vacunación (30m)</span></div>
+      <div class="legend-item"><span class="color-dot dot-cirugia"></span><span class="legend-text">Cirugía (3h)</span></div>
+      <div class="legend-item"><span class="color-dot dot-chequeo"></span><span class="legend-text">Chequeo (30m)</span></div>
+    </div>
+  </div>
+
+  <div class="dashboard-content">
+    <div class="calendar-section card-shadow">
+      <full-calendar #calendar [options]="calendarOptions"></full-calendar>
+    </div>
+
+    <div class="form-section card-shadow">
+      
+      <ng-container *ngIf="!turnoSeleccionado">
+        <div class="form-header">
+          <h3>Nuevo Turno</h3>
+        </div>
+
+        <div class="form-body">
+          
+          <div class="form-group">
+            <label>Fecha y Hora</label>
+            <input type="datetime-local" [(ngModel)]="turnoForm.fechaHora">
+          </div>
+
+          <div class="form-group">
+            <label>Seleccionar Mascota</label>
+            <select [(ngModel)]="turnoForm.mascotaNombre">
+              <option value="" disabled selected>-- Elige una mascota --</option>
+              <option *ngFor="let mascota of mascotasBD" [value]="mascota.nombre">
+                {{ mascota.nombre }}
+              </option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Servicio</label>
+            <select [(ngModel)]="turnoForm.tipo">
+              <option value="Veterinaria">🩺 Consulta General (1h)</option>
+              <option value="Peluqueria">✂️ Peluquería (2h)</option>
+              <option value="Vacunacion">💉 Vacunación/Desparasitación (30m)</option>
+              <option value="Cirugia">🏥 Cirugía (3h)</option>
+              <option value="Chequeo">📋 Chequeo de Rutina (30m)</option>
+            </select>
+          </div>
+
+          <button class="btn-submit" (click)="guardarTurno()" [disabled]="!turnoForm.fechaHora || !turnoForm.mascotaNombre">
+            Agendar Turno
+          </button>
+        </div>
+      </ng-container>
+
+      <ng-container *ngIf="turnoSeleccionado">
+        <div class="form-header">
+          <h3>Detalle del Turno</h3>
+          <p class="text-selected" [ngClass]="{'bg-peluqueria-light': turnoSeleccionado.tipo === 'Peluqueria', 'bg-veterinaria-light': turnoSeleccionado.tipo === 'Veterinaria'}">
+            {{ turnoSeleccionado.title }}
+          </p>
+        </div>
+        
+        <div class="form-body">
+          <div class="info-group">
+            <span class="info-label">Fecha y Hora:</span>
+            <span class="info-value">{{ turnoSeleccionado.start | date:'EEEE d, HH:mm' : 'UTC' }}</span>
+          </div>
+          <div class="info-group">
+            <span class="info-label">Mascota:</span>
+            <span class="info-value">{{ turnoSeleccionado.mascotaNombre }}</span>
+          </div>
+          <div class="info-group">
+            <span class="info-label">Servicio:</span>
+            <span class="info-value">{{ turnoSeleccionado.tipo }}</span>
+          </div>
+
+          <button class="btn-delete" (click)="eliminarTurno()">
+            🗑️ Eliminar Turno
+          </button>
+          <button class="btn-cancel" (click)="turnoSeleccionado = null">
+            Cancelar
+          </button>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<div class="main-layout" *ngIf="!cargando">
+  <div class="container" *ngIf="dueno">
+    <div class="header-actions">
+      <button class="btn-back" routerLink="/duenos">← Volver a Dueños</button>
+    </div>
+
+    <div class="profile-card fade-in">
+      <div class="profile-header">
+        <div class="avatar-large">{{ dueno.nombre?.charAt(0) }}</div>
+        <div class="info">
+          <h1>{{ dueno.nombre }} {{ dueno.apellido }}</h1>
+          <p class="phone-tag">📞 {{ dueno.telefono }}</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <div class="mascotas-section">
+        <h2 class="section-title">🐾 Mascotas Registradas ({{ mascotas.length }})</h2>
+        
+        <div class="mascotas-grid">
+          <div *ngFor="let pet of mascotas" class="pet-mini-card" [routerLink]="['/detalle', pet.id]">
+            
+            <div class="pet-avatar">{{ pet.nombre?.charAt(0) }}</div>
+            <div class="pet-details">
+              <h3>{{ pet.nombre }}</h3>
+              <span>{{ pet.raza }}</span>
+              <small>{{ pet.edad }} años • {{ pet.peso }} kg</small>
+            </div>
+            <div class="arrow">→</div>
+          </div>
+
+          <div *ngIf="mascotas.length === 0" class="empty-state">
+            Este cliente aún no tiene mascotas registradas.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="spinner-container" *ngIf="cargando">
+  <div class="spinner"></div>
+</div>

@@ -1,12 +1,14 @@
-import { Component, signal } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
+import { Header } from './component/header/header';
+import { Footer } from './component/footer/footer';
+import { FullCalendarModule } from '@fullcalendar/angular';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  standalone: true,
+  imports: [RouterModule, Header, Footer, FullCalendarModule],
+  templateUrl: './app.html'
 })
 export class App {
-  protected readonly title = signal('angular-net');
-}
+ }

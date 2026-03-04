@@ -1,0 +1,142 @@
+<div class="spinner-container-global" *ngIf="loading">
+  <div class="spinner"></div>
+  <p>Cargando mascota...</p>
+</div>
+
+<div class="main-layout" *ngIf="!loading && mascota">
+  <div class="card-container">
+    <div class="header-actions">
+      <button class="btn-back" routerLink="/duenos">← Volver</button>
+      <button class="btn-edit" (click)="toggleEdit()">
+        {{ editando ? '✖ Cancelar' : '✎ Editar Mascota' }}
+      </button>
+    </div>
+
+    <div class="pet-card">
+      
+      <div *ngIf="editando" class="edit-form fade-in">
+        <div class="avatar-circle">{{ mascota.nombre?.charAt(0) | uppercase }}</div>
+        <input [(ngModel)]="mascota.nombre" placeholder="Nombre" class="edit-input">
+        <input [(ngModel)]="mascota.raza" placeholder="Raza" class="edit-input">
+        
+        <div class="stats-row">
+          <div class="stat">
+            <label>Edad</label>
+            <input type="number" [(ngModel)]="mascota.edad" class="edit-input" id="edit-input1">
+          </div>
+          <div class="stat">
+            <label>Peso</label>
+            <input type="number" [(ngModel)]="mascota.peso" class="edit-input" id="edit-input1">
+          </div>
+        </div>
+        
+        <button class="btn-save" (click)="guardarCambios()" [disabled]="cargandoGuardar">
+          {{ cargandoGuardar ? 'Guardando...' : '💾 Guardar Cambios' }}
+        </button>
+      </div>
+
+      <div *ngIf="!editando" class="view-mode fade-in dashboard-grid">
+        
+        <div class="profile-section">
+          <div class="avatar-circle">{{ mascota.nombre?.charAt(0) | uppercase }}</div>
+          <h1 class="title">{{ mascota.nombre }}</h1>
+          <span class="raza-tag">{{ mascota.raza }}</span>
+
+          <div class="stats-container">
+            <div class="stat-box">
+              <span class="stat-label">Edad</span>
+              <span class="stat-value">{{ mascota.edad }} <small>años</small></span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">Peso</span>
+              <span class="stat-value">{{ mascota.peso }} <small>kg</small></span>
+            </div>
+          </div>
+
+          <div class="ai-box">
+            <h3 class="ai-header">✨ Biografía Gemini</h3>
+            <div *ngIf="cargandoIA" class="spinner-mini-container">
+              <div class="spinner-small"></div>
+            </div>
+            <p *ngIf="!cargandoIA" class="ai-content">{{ descripcionIA }}</p>
+          </div>
+        </div>
+
+        <div class="vacunas-section">
+          <h3 class="section-subtitle">💉 Historial de Vacunas</h3>
+          <div class="vacunas-list">
+            <div *ngFor="let item of plan" class="vacuna-card" [ngClass]="item.aplicada ? 'is-aplicada' : 'is-pendiente'">
+              
+              <ng-container *ngIf="vacunaEditando?.vacunaId !== item.vacunaId">
+                <div class="vacuna-info">
+                  <span class="vacuna-nombre">{{ item.nombreVacuna }}</span>
+                  <span class="vacuna-fecha">
+                    {{ item.fecha ? (item.fecha | date:'dd/MM/yyyy') : 'Sin fecha' }}
+                  </span>
+                </div>
+                <div class="vacuna-badge-container">
+                  <span class="badge" [ngClass]="item.aplicada ? 'badge-green' : 'badge-red'">
+                    {{ item.aplicada ? '✔ Aplicada' : '⌛ Pendiente' }}
+                  </span>
+                  <button class="btn-icon" (click)="iniciarEdicionVacuna(item)">✏️</button>
+                </div>
+              </ng-container>
+
+              <ng-container *ngIf="vacunaEditando?.vacunaId === item.vacunaId">
+                <div class="vacuna-edit-mode">
+                  <div class="vacuna-edit-controls">
+                    <input type="checkbox" [(ngModel)]="vacunaEditando.aplicada">
+                    <input type="date" [(ngModel)]="vacunaEditando.fecha" class="edit-input date-small">
+                  </div>
+                  <div class="vacuna-edit-actions">
+                    <button class="btn-save-sm" (click)="guardarVacuna()">✔</button>
+                    <button class="btn-cancel-sm" (click)="cancelarEdicionVacuna()">✖</button>
+                  </div>
+                </div>
+              </ng-container>
+
+            </div>
+          </div>
+        </div>
+
+        <div class="columna-derecha">
+          
+          <div class="turnos-section">
+            <h3 class="section-subtitle">📅 Próximos Turnos</h3>
+            
+            <div *ngIf="proximosTurnos.length === 0" class="empty-turnos">
+              <p>No hay turnos programados.</p>
+            </div>
+
+            <div class="turnos-list" *ngIf="proximosTurnos.length > 0">
+              <div *ngFor="let turno of proximosTurnos" class="turno-card">
+                <div class="turno-icon">
+                  <span *ngIf="turno.tipo === 'Veterinaria'">🩺</span>
+                  <span *ngIf="turno.tipo === 'Peluqueria'">✂️</span>
+                  <span *ngIf="turno.tipo === 'Vacunacion'">💉</span>
+                  <span *ngIf="turno.tipo === 'Cirugia'">🏥</span>
+                  <span *ngIf="turno.tipo === 'Chequeo'">📋</span>
+                </div>
+                <div class="turno-info">
+                  <span class="turno-tipo">{{ turno.tipo }}</span>
+                  <span class="turno-fecha">{{ turno.fechaHora | date:'dd/MM/yyyy - HH:mm' }} hs</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="historial-clinico-section">
+            <h3 class="section-subtitle">📚 Historial Clínico</h3>
+            <div class="historial-placeholder">
+              <span class="historial-icon">📂</span>
+              <p>El historial de consultas médicas y procedimientos aparecerá aquí.</p>
+              <small>(Próximamente)</small>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

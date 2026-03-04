@@ -1,0 +1,52 @@
+<div class="app-container">
+
+
+  <div class="content-wrapper">
+    <section class="form-card">
+      <h2>Nuevo Dueño</h2>
+      <div class="form-group">
+        <label>Nombre</label>
+        <input type="text" placeholder="Ej: Juan" [(ngModel)]="nuevoDueno.nombre">
+      </div>
+      <div class="form-group">
+        <label>Apellido</label>
+        <input type="text" placeholder="Ej: Pérez" [(ngModel)]="nuevoDueno.apellido">
+      </div>
+      <div class="form-group">
+        <label>Teléfono</label>
+        <input type="tel" placeholder="Ej: 11 2233-4455" [(ngModel)]="nuevoDueno.telefono">
+      </div>
+      <button (click)="guardarDueno()" class="btn-save">Registrar Dueño</button>
+    </section>
+
+    <section class="list-section">
+      <h2>Dueños Registrados</h2>
+      <div class="empty-state" *ngIf="duenos.length === 0">
+        <p>No hay dueños registrados aún.</p>
+      </div>
+      <div class="grid-container" *ngIf="duenos.length > 0">
+  <div class="pet-card clickable" 
+       *ngFor="let dueno of paginatedDuenos" 
+       [routerLink]="['/duenos', dueno.id]">
+    
+    <div class="card-icon">👤</div>
+    <div class="card-info">
+      <h3>{{ dueno.nombre }} {{ dueno.apellido }}</h3>
+      <span class="breed">Responsable</span>
+      <div class="details">
+        <span><strong>Tel:</strong> {{ dueno.telefono || '---' }}</span>
+      </div>
+      <div class="view-pets-hint">Ver mascotas →</div>
+    </div>
+  </div>
+</div>
+      
+
+      <div class="pagination" *ngIf="duenos.length > itemsPerPage">
+        <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Anterior</button>
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <button (click)="currentPage = currentPage + 1" [disabled]="currentPage >= totalPages">Siguiente</button>
+      </div>
+    </section>
+  </div>
+</div>

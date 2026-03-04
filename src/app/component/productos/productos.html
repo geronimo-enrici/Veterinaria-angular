@@ -1,0 +1,254 @@
+<div class="modal-overlay" *ngIf="mostrarModalLogin">
+  <div class="login-card">
+    <div class="modal-header">
+      <h3>Iniciar Sesión</h3>
+      <button class="btn-close-icon" (click)="mostrarModalLogin = false">✕</button>
+    </div>
+    
+    <div class="input-group">
+      <label>Correo Electrónico</label>
+      <input type="email" [(ngModel)]="loginEmail" placeholder="ejemplo@correo.com">
+    </div>
+    
+    <div class="input-group">
+      <label>Contraseña</label>
+      <input type="password" [(ngModel)]="loginPassword" placeholder="••••••••">
+    </div>
+
+    <p *ngIf="errorLogin" class="error-text">Datos incorrectos. Revisa la consola para más detalles.</p>
+    
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="mostrarModalLogin = false">Cancelar</button>
+      <button class="btn-confirmar" [disabled]="cargandoLogin" (click)="iniciarSesion()">
+        {{ cargandoLogin ? 'Cargando...' : 'Entrar' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="store-layout">
+  <div class="admin-panel-trigger" *ngIf="esAdmin && !modoAdmin">
+    <button (click)="abrirPanelAdmin()">⚙️ Gestionar Stock e Inventario</button>
+  </div>
+
+  <div class="admin-panel" *ngIf="modoAdmin">
+    <div class="admin-header">
+      <h2>📦 Panel de Control e Inventario</h2>
+      <div class="admin-header-actions">
+        <button class="btn-create-prod" (click)="toggleFormularioCrear()">
+          {{ mostrarFormularioCrear ? '✖ Cancelar' : '✨ Nuevo Producto' }}
+        </button>
+        <button class="btn-close-admin" (click)="modoAdmin = false">Volver a la Tienda</button>
+      </div>
+    </div>
+    
+    <div class="create-prod-form fade-in" *ngIf="mostrarFormularioCrear">
+      <h3>Crear Nuevo Producto en la Base de Datos</h3>
+      <div class="form-grid">
+        <div class="input-group">
+          <label>Icono (Emoji)</label>
+          <input type="text" [(ngModel)]="nuevoProducto.icono" placeholder="Ej: 🦴">
+        </div>
+        <div class="input-group">
+          <label>Nombre del Producto</label>
+          <input type="text" [(ngModel)]="nuevoProducto.nombre" placeholder="Ej: Alimento Perro">
+        </div>
+        <div class="input-group">
+          <label>Categoría</label>
+          <select [(ngModel)]="nuevoProducto.categoria">
+            <option value="Comida">Comida</option>
+            <option value="Juguetes">Juguetes</option>
+            <option value="Accesorios">Accesorios</option>
+            <option value="Higiene">Higiene</option>
+            <option value="Farmacia">Farmacia</option>
+            <option value="Vacunas">Vacunas</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label>Precio ($)</label>
+          <input type="number" [(ngModel)]="nuevoProducto.precio" min="0">
+        </div>
+        <div class="input-group">
+          <label>Stock Inicial</label>
+          <input type="number" [(ngModel)]="nuevoProducto.stock" min="0">
+        </div>
+        <div class="input-group btn-group-align">
+          <button class="btn-save-new" (click)="crearProducto()" [disabled]="creandoProducto">
+            {{ creandoProducto ? 'Creando...' : '➕ Agregar Producto' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Precio Actual / Nuevo</th>
+            <th>Stock Actual</th>
+            <th>Aumentar Stock</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let prod of todosLosProductos" [class.deleting]="eliminandoId === prod.id">
+            <td>
+              <div class="td-prod-info">
+                <span class="t-icon">{{ prod.icono }}</span> 
+                <span>{{ prod.nombre }}</span>
+              </div>
+            </td>
+            <td><span class="category-tag-sm">{{ prod.categoria }}</span></td>
+            <td>
+              <span class="currency-symbol">$</span>
+              <input type="number" min="0" step="0.01" class="input-precio" [(ngModel)]="nuevosPrecios[prod.id]">
+            </td>
+            <td><span class="badge-stock">{{ prod.stock }} un.</span></td>
+            <td>
+              <input type="number" min="0" class="input-stock" [(ngModel)]="ingresosStock[prod.id]" placeholder="0">
+            </td>
+            <td>
+              <button class="btn-delete-prod" (click)="eliminarProducto(prod.id)" [disabled]="eliminandoId === prod.id" title="Eliminar producto">
+                🗑️
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="admin-actions">
+      <button class="btn-save" [disabled]="guardandoStock" (click)="guardarNuevoStock()">
+        {{ guardandoStock ? 'Procesando...' : '💾 Guardar Cambios de Stock/Precio' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="products-section" *ngIf="!modoAdmin">
+    <div class="filters-bar">
+      <div class="search-wrapper">
+        <span class="search-icon">🔍</span>
+        <input type="text" [(ngModel)]="busqueda" (input)="aplicarFiltros()" placeholder="¿Qué buscas para tu mascota?">
+      </div>
+      <div class="select-wrapper">
+        <select [(ngModel)]="categoriaSeleccionada" (change)="aplicarFiltros()">
+          <option value="Todos">Todas las Categorías</option>
+          <option value="Vacunas">Vacunas</option>
+          <option value="Comida">Comida</option>
+          <option value="Juguetes">Juguetes</option>
+          <option value="Accesorios">Accesorios</option>
+          <option value="Higiene">Higiene</option>
+          <option value="Farmacia">Farmacia</option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngIf="cargando" class="loader-container">
+      <div class="spinner"></div>
+      <p>Conectando con el inventario...</p>
+    </div>
+
+    <div class="products-grid" *ngIf="!cargando">
+      <div *ngFor="let prod of productosPaginados" class="product-card" [class.no-stock]="prod.stock <= 0">
+        <div class="card-badge" *ngIf="prod.stock <= 3 && prod.stock > 0">¡Últimas unidades!</div>
+        <span class="product-icon">{{ prod.icono }}</span>
+        <h3>{{ prod.nombre }}</h3>
+        <span class="category-tag">{{ prod.categoria }}</span>
+        <p class="price">${{ prod.precio | number }}</p>
+        <p class="stock-info">Disponibles: <strong>{{ prod.stock }}</strong></p>
+        
+        <div class="card-footer-actions">
+          <button class="btn-add" 
+                  [disabled]="prod.stock <= 0 || obtenerCantidadEnCarrito(prod.id) >= prod.stock" 
+                  (click)="intentarAgregarAlCarrito(prod)">
+            <span *ngIf="prod.stock > 0">
+              {{ obtenerCantidadEnCarrito(prod.id) >= prod.stock ? 'Máximo en carrito' : '+ Agregar al carrito' }}
+            </span>
+            <span *ngIf="prod.stock <= 0">Sin Stock</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination" *ngIf="totalPaginas > 1 && !cargando">
+      <button class="btn-pag" [disabled]="paginaActual === 1" (click)="cambiarPagina(paginaActual - 1)">Anterior</button>
+      <div class="pages-list">
+        <button *ngFor="let p of [].constructor(totalPaginas); let i = index" 
+                [class.active]="paginaActual === i + 1" (click)="cambiarPagina(i + 1)">
+          {{ i + 1 }}
+        </button>
+      </div>
+      <button class="btn-pag" [disabled]="paginaActual === totalPaginas" (click)="cambiarPagina(paginaActual + 1)">Siguiente</button>
+    </div>
+  </div>
+
+  <aside class="cart-sidebar" *ngIf="!modoAdmin && estaLogueado">
+    <div class="cart-header">
+      <h3>Tu Carrito 🛒</h3>
+      <span class="item-count">{{ carrito.length }} items</span>
+    </div>
+    
+    <div class="cart-items-container">
+      <div *ngIf="carrito.length === 0" class="empty-cart-msg">
+        <p>Aún no has agregado productos.</p>
+      </div>
+      
+      <div *ngFor="let item of carrito" class="cart-item">
+        <div class="item-main">
+          <span class="item-name">{{ item.producto.nombre }}</span>
+          <span class="item-subtotal">${{ (item.producto.precio * item.cantidad) | number }}</span>
+        </div>
+        <div class="item-controls">
+          <div class="qty-selector">
+            <button (click)="restarDelCarrito(item.producto.id)">-</button>
+            <span class="qty">{{ item.cantidad }}</span>
+            <button [disabled]="item.cantidad >= item.producto.stock" (click)="intentarAgregarAlCarrito(item.producto)">+</button>
+          </div>
+          <button class="btn-remove" (click)="eliminarDelCarrito(item.producto.id)">🗑️</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="cart-summary" *ngIf="carrito.length > 0">
+      <div class="payment-methods">
+        <p class="method-title">Forma de Pago:</p>
+        <div class="method-options">
+          <label class="method-chip" [class.active]="metodoPago === 'Efectivo'">
+            <input type="radio" name="pago" (change)="cambiarMetodoPago('Efectivo')"> 
+            💵 Efectivo <small>(-10%)</small>
+          </label>
+          <label class="method-chip" [class.active]="metodoPago === 'Transferencia'">
+            <input type="radio" name="pago" (change)="cambiarMetodoPago('Transferencia')" checked> 
+            🏦 Transf.
+          </label>
+          <label class="method-chip" [class.active]="metodoPago === 'Tarjeta'">
+            <input type="radio" name="pago" (change)="cambiarMetodoPago('Tarjeta')"> 
+            💳 Tarjeta <small>(+10%)</small>
+          </label>
+        </div>
+      </div>
+
+      <div class="summary-details">
+        <div class="detail-row">
+          <span>Subtotal:</span>
+          <span>${{ total | number }}</span>
+        </div>
+        <div class="detail-row" *ngIf="descuentoRecargo !== 0" [class.discount]="descuentoRecargo < 0" [class.charge]="descuentoRecargo > 0">
+          <span>{{ descuentoRecargo < 0 ? 'Descuento:' : 'Recargo:' }}</span>
+          <span>{{ descuentoRecargo < 0 ? '-' : '+' }}${{ (descuentoRecargo < 0 ? -descuentoRecargo : descuentoRecargo) | number }}</span>
+        </div>
+        <div class="total-row main-total">
+          <span>Total a pagar:</span>
+          <span class="total-amount">${{ totalFinal | number }}</span>
+        </div>
+      </div>
+
+      <button class="btn-checkout" (click)="confirmarCompra()">
+        🚀 Confirmar por {{ metodoPago }}
+      </button>
+      <button class="btn-clear" (click)="vaciarCarrito()">Limpiar Carrito</button>
+    </div>
+  </aside>
+</div>

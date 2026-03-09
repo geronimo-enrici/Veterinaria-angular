@@ -26,6 +26,11 @@ export class Header implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       document.body.style.overflow = this.menuAbierto ? 'hidden' : 'auto';
     }
+    if (this.menuAbierto) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
   }
 
   verificarSesion() {

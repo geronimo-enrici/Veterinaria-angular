@@ -35,9 +35,20 @@
     <div class="admin-header">
       <h2>📦 Panel de Control e Inventario</h2>
       <div class="admin-header-actions">
+        
+        <button class="btn-create-prod" style="background-color: #10b981;" (click)="descargarExcel()" [disabled]="descargandoExcel">
+          {{ descargandoExcel ? '⏳' : '📥' }} Descargar Excel
+        </button>
+        
+        <label class="btn-create-prod" style="background-color: #3b82f6; cursor: pointer;">
+          {{ sincronizandoExcel ? '⏳' : '📤' }} Subir Excel
+          <input type="file" style="display: none;" accept=".xlsx" (change)="sincronizarExcel($event)" [disabled]="sincronizandoExcel">
+        </label>
+
         <button class="btn-create-prod" (click)="toggleFormularioCrear()">
           {{ mostrarFormularioCrear ? '✖ Cancelar' : '✨ Nuevo Producto' }}
         </button>
+        
         <button class="btn-close-admin" (click)="modoAdmin = false">Volver a la Tienda</button>
       </div>
     </div>

@@ -44,6 +44,9 @@ export class Productos implements OnInit {
   creandoProducto = false;
   eliminandoId: number | null = null;
   
+  descargandoExcel = false;
+  sincronizandoExcel = false;
+
   nuevoProducto: Partial<Producto> = {
     nombre: '',
     categoria: 'Comida',
@@ -332,5 +335,53 @@ export class Productos implements OnInit {
         this.eliminandoId = null;
       }
     });
+  }
+
+  descargarExcel() {
+    this.descargandoExcel = true;
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+    this.http.get(`${this.apiUrl}/Productos/descargar-excel`, { headers, responseType: 'blob' }).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Inventario_Productos.xlsx';
+        a.click();
+        window.URL.revokeObjectURL(url);
+        this.descargandoExcel = false;
+      },
+      error: () => {
+        alert('Error al descargar el archivo Excel.');
+        this.descargandoExcel = false;
+      }
+    });
+  }
+
+  sincronizarExcel(event: any) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    this.sincronizandoExcel = true;
+    const formData = new FormData();
+    formData.append('archivo', file);
+
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': `Bearer ${token}` });
+
+    this.http.post(`${this.apiUrl}/Productos/sincronizar-excel`, formData, { headers }).subscribe({
+      next: (res: any) => {
+        alert(`Sincronización exitosa.\nProcesados: ${res.procesados}\nEliminados: ${res.eliminados}`);
+        this.sincronizandoExcel = false;
+        window.location.reload();
+      },
+      error: (err) => {
+        alert('Error al sincronizar el archivo Excel.');
+        this.sincronizandoExcel = false;
+      }
+    });
+    
+    event.target.value = '';
   }
 }

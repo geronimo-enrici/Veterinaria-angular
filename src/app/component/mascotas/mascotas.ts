@@ -16,7 +16,8 @@ export class Mascotas {
   mascotas: any[] = [];
   duenos: any[] = []; 
   currentPage: number = 1;
-  itemsPerPage: number = 6;
+  itemsPerPage: number = 8;
+  searchTerm: string = '';
 
   nuevaMascota: any = { nombre: '', raza: '', edad: null, peso: null, duenoId: null };
 
@@ -32,13 +33,32 @@ export class Mascotas {
     });
   }
 
-  get paginatedMascotas() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.mascotas.slice(startIndex, startIndex + this.itemsPerPage);
+  get filteredMascotas() {
+    if (!this.searchTerm) return this.mascotas;
+    
+    const term = this.searchTerm.toLowerCase();
+    return this.mascotas.filter(m => 
+      m.nombre.toLowerCase().includes(term) ||
+      m.raza.toLowerCase().includes(term) ||
+      (m.dueno && m.dueno.nombre.toLowerCase().includes(term))
+    );
   }
 
   get totalPages() {
-    return Math.ceil(this.mascotas.length / this.itemsPerPage);
+    return Math.ceil(this.filteredMascotas.length / this.itemsPerPage) || 1;
+  }
+
+  get paginatedMascotas() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const currentItems = this.filteredMascotas.slice(startIndex, startIndex + this.itemsPerPage);
+    const placeholdersNeeded = this.itemsPerPage - currentItems.length;
+    const placeholders = Array(placeholdersNeeded).fill({ isPlaceholder: true });
+
+    return [...currentItems, ...placeholders];
+  }
+
+  onSearchChange() {
+    this.currentPage = 1;
   }
 
   obtenerMascotas() {
@@ -57,7 +77,7 @@ export class Mascotas {
         this.duenos = data;
         this.cdr.detectChanges();
       },
-      error: (e) => console.error('Error al obtener dueños:', e)
+      error: (e) => console.error('Error:', e)
     });
   }
 
@@ -72,13 +92,14 @@ export class Mascotas {
         this.obtenerMascotas();
         this.nuevaMascota = { nombre: '', raza: '', edad: null, peso: null, duenoId: null };
       },
-      error: (e) => console.error('Error al guardar:', e)
+      error: (e) => console.error('Error:', e)
     });
   }
 
   irAlDetalle(id: number) {
     this.router.navigate(['/detalle', id]);
   }
+  
   irADuenos() {
     this.router.navigate(['/duenos']);
   }

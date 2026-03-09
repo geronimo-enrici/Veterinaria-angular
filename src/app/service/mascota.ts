@@ -36,4 +36,11 @@ actualizarVacuna(idMascota: number, idVacuna: number, datos: any): Observable<an
 getDuenoDetalle(id: number): Observable<any> {
   return this.http.get(`https://backend-hmz6.onrender.com/api/Duenos/${id}`);
 }
+getHistorial(mascotaId: number) {
+  return this.http.get<any[]>(`${this.apiUrl}/${mascotaId}/historial`);
+}
+
+agregarHistorial(mascotaId: number, registro: any) {
+  return this.http.post<any>(`${this.apiUrl}/${mascotaId}/historial`, registro);
+}
 }

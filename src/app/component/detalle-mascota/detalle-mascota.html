@@ -13,7 +13,6 @@
     </div>
 
     <div class="pet-card">
-      
       <div *ngIf="editando" class="edit-form fade-in">
         <div class="avatar-circle">{{ mascota.nombre?.charAt(0) | uppercase }}</div>
         <input [(ngModel)]="mascota.nombre" placeholder="Nombre" class="edit-input">
@@ -22,11 +21,11 @@
         <div class="stats-row">
           <div class="stat">
             <label>Edad</label>
-            <input type="number" [(ngModel)]="mascota.edad" class="edit-input" id="edit-input1">
+            <input type="number" [(ngModel)]="mascota.edad" class="edit-input">
           </div>
           <div class="stat">
             <label>Peso</label>
-            <input type="number" [(ngModel)]="mascota.peso" class="edit-input" id="edit-input1">
+            <input type="number" [(ngModel)]="mascota.peso" class="edit-input">
           </div>
         </div>
         
@@ -35,14 +34,17 @@
         </button>
       </div>
 
-      <div *ngIf="!editando" class="view-mode fade-in dashboard-grid">
+      <div *ngIf="!editando" class="view-mode fade-in">
         
-        <div class="profile-section">
-          <div class="avatar-circle">{{ mascota.nombre?.charAt(0) | uppercase }}</div>
-          <h1 class="title">{{ mascota.nombre }}</h1>
-          <span class="raza-tag">{{ mascota.raza }}</span>
-
-          <div class="stats-container">
+        <div class="profile-section-top">
+          <div class="profile-info-basic">
+            <div class="avatar-circle">{{ mascota.nombre?.charAt(0) | uppercase }}</div>
+            <div class="profile-text-info">
+              <h1 class="title">{{ mascota.nombre }}</h1>
+              <span class="raza-tag">{{ mascota.raza }}</span>
+            </div>
+          </div>
+          <div class="stats-container-top">
             <div class="stat-box">
               <span class="stat-label">Edad</span>
               <span class="stat-value">{{ mascota.edad }} <small>años</small></span>
@@ -52,91 +54,170 @@
               <span class="stat-value">{{ mascota.peso }} <small>kg</small></span>
             </div>
           </div>
-
-          <div class="ai-box">
-            <h3 class="ai-header">✨ Biografía Gemini</h3>
-            <div *ngIf="cargandoIA" class="spinner-mini-container">
-              <div class="spinner-small"></div>
-            </div>
-            <p *ngIf="!cargandoIA" class="ai-content">{{ descripcionIA }}</p>
-          </div>
         </div>
 
-        <div class="vacunas-section">
-          <h3 class="section-subtitle">💉 Historial de Vacunas</h3>
-          <div class="vacunas-list">
-            <div *ngFor="let item of plan" class="vacuna-card" [ngClass]="item.aplicada ? 'is-aplicada' : 'is-pendiente'">
-              
-              <ng-container *ngIf="vacunaEditando?.vacunaId !== item.vacunaId">
-                <div class="vacuna-info">
-                  <span class="vacuna-nombre">{{ item.nombreVacuna }}</span>
-                  <span class="vacuna-fecha">
-                    {{ item.fecha ? (item.fecha | date:'dd/MM/yyyy') : 'Sin fecha' }}
-                  </span>
-                </div>
-                <div class="vacuna-badge-container">
-                  <span class="badge" [ngClass]="item.aplicada ? 'badge-green' : 'badge-red'">
-                    {{ item.aplicada ? '✔ Aplicada' : '⌛ Pendiente' }}
-                  </span>
-                  <button class="btn-icon" (click)="iniciarEdicionVacuna(item)">✏️</button>
-                </div>
-              </ng-container>
-
-              <ng-container *ngIf="vacunaEditando?.vacunaId === item.vacunaId">
-                <div class="vacuna-edit-mode">
-                  <div class="vacuna-edit-controls">
-                    <input type="checkbox" [(ngModel)]="vacunaEditando.aplicada">
-                    <input type="date" [(ngModel)]="vacunaEditando.fecha" class="edit-input date-small">
-                  </div>
-                  <div class="vacuna-edit-actions">
-                    <button class="btn-save-sm" (click)="guardarVacuna()">✔</button>
-                    <button class="btn-cancel-sm" (click)="cancelarEdicionVacuna()">✖</button>
-                  </div>
-                </div>
-              </ng-container>
-
-            </div>
-          </div>
-        </div>
-
-        <div class="columna-derecha">
+        <div class="dashboard-grid">
           
-          <div class="turnos-section">
-            <h3 class="section-subtitle">📅 Próximos Turnos</h3>
-            
-            <div *ngIf="proximosTurnos.length === 0" class="empty-turnos">
-              <p>No hay turnos programados.</p>
+          <div class="columna-lateral">
+            <div class="turnos-section">
+              <h3 class="section-subtitle">📅 Próximos Turnos</h3>
+              
+              <div *ngIf="proximosTurnos.length === 0" class="empty-turnos">
+                <p>No hay turnos programados.</p>
+              </div>
+
+              <div class="turnos-list" *ngIf="proximosTurnos.length > 0">
+                <div *ngFor="let turno of proximosTurnos" class="turno-card">
+                  <div class="turno-icon">
+                    <span *ngIf="turno.tipo === 'Veterinaria'">🩺</span>
+                    <span *ngIf="turno.tipo === 'Peluqueria'">✂️</span>
+                    <span *ngIf="turno.tipo === 'Vacunacion'">💉</span>
+                    <span *ngIf="turno.tipo === 'Cirugia'">🏥</span>
+                    <span *ngIf="turno.tipo === 'Chequeo'">📋</span>
+                  </div>
+                  <div class="turno-info">
+                    <span class="turno-tipo">{{ turno.tipo }}</span>
+                    <span class="turno-fecha">{{ turno.fechaHora | date:'dd/MM/yyyy - HH:mm' }} hs</span>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div class="turnos-list" *ngIf="proximosTurnos.length > 0">
-              <div *ngFor="let turno of proximosTurnos" class="turno-card">
-                <div class="turno-icon">
-                  <span *ngIf="turno.tipo === 'Veterinaria'">🩺</span>
-                  <span *ngIf="turno.tipo === 'Peluqueria'">✂️</span>
-                  <span *ngIf="turno.tipo === 'Vacunacion'">💉</span>
-                  <span *ngIf="turno.tipo === 'Cirugia'">🏥</span>
-                  <span *ngIf="turno.tipo === 'Chequeo'">📋</span>
-                </div>
-                <div class="turno-info">
-                  <span class="turno-tipo">{{ turno.tipo }}</span>
-                  <span class="turno-fecha">{{ turno.fechaHora | date:'dd/MM/yyyy - HH:mm' }} hs</span>
+            <div class="vacunas-section">
+              <h3 class="section-subtitle">💉 Historial de Vacunas</h3>
+              <div class="vacunas-list">
+                <div *ngFor="let item of plan" class="vacuna-card" [ngClass]="item.aplicada ? 'is-aplicada' : 'is-pendiente'">
+                  
+                  <ng-container *ngIf="vacunaEditando?.vacunaId !== item.vacunaId">
+                    <div class="vacuna-info">
+                      <span class="vacuna-nombre">{{ item.nombreVacuna }}</span>
+                      <span class="vacuna-fecha">
+                        {{ item.fecha ? (item.fecha | date:'dd/MM/yyyy') : 'Sin fecha' }}
+                      </span>
+                    </div>
+                    <div class="vacuna-badge-container">
+                      <span class="badge" [ngClass]="item.aplicada ? 'badge-green' : 'badge-red'">
+                        {{ item.aplicada ? '✔ Aplicada' : '⌛ Pendiente' }}
+                      </span>
+                      <button class="btn-icon" (click)="iniciarEdicionVacuna(item)">✏️</button>
+                    </div>
+                  </ng-container>
+
+                  <ng-container *ngIf="vacunaEditando?.vacunaId === item.vacunaId">
+                    <div class="vacuna-edit-mode">
+                      <div class="vacuna-edit-controls">
+                        <input type="checkbox" [(ngModel)]="vacunaEditando.aplicada">
+                        <input type="date" [(ngModel)]="vacunaEditando.fecha" class="edit-input date-small">
+                      </div>
+                      <div class="vacuna-edit-actions">
+                        <button class="btn-save-sm" (click)="guardarVacuna()">✔</button>
+                        <button class="btn-cancel-sm" (click)="cancelarEdicionVacuna()">✖</button>
+                      </div>
+                    </div>
+                  </ng-container>
+
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="historial-clinico-section">
-            <h3 class="section-subtitle">📚 Historial Clínico</h3>
-            <div class="historial-placeholder">
-              <span class="historial-icon">📂</span>
-              <p>El historial de consultas médicas y procedimientos aparecerá aquí.</p>
-              <small>(Próximamente)</small>
+          <div class="columna-principal">
+            <div class="historial-clinico-section full-width">
+              <div class="section-header-row">
+                <h2 class="section-subtitle">Historial Clínico</h2>
+                <button class="btn-save-sm" (click)="abrirModalNuevoRegistro()">+ Nuevo Registro</button>
+              </div>
+
+              <div class="historial-timeline" *ngIf="historial && historial.length > 0; else noHistorial">
+                <div class="timeline-item" *ngFor="let registro of historial">
+                  <div class="timeline-date">
+                    <span class="date-day">{{ registro.fecha | date:'dd' }}</span>
+                    <span class="date-month">{{ registro.fecha | date:'MMM yyyy' }}</span>
+                  </div>
+
+                  <div class="timeline-content">
+                    <div class="timeline-header">
+                      <h3>{{ registro.motivoConsulta }}</h3>
+                      <span class="vet-badge">👨‍⚕️ Dr/a. {{ registro.veterinario }}</span>
+                    </div>
+                    
+                    <div class="timeline-body">
+                      <div class="info-block">
+                        <span class="info-label">Diagnóstico</span>
+                        <p>{{ registro.diagnostico }}</p>
+                      </div>
+                      <div class="info-block">
+                        <span class="info-label">Tratamiento Indicado</span>
+                        <p>{{ registro.tratamiento }}</p>
+                      </div>
+                      <div class="info-block extra-notes" *ngIf="registro.observaciones">
+                        <span class="info-label">Observaciones</span>
+                        <p><em>{{ registro.observaciones }}</em></p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <ng-template #noHistorial>
+                <div class="historial-placeholder">
+                  <div class="historial-icon">📋</div>
+                  <p>Aún no hay registros médicos para esta mascota.</p>
+                  <button class="btn-cancel" (click)="abrirModalNuevoRegistro()">Crear el primer registro</button>
+                </div>
+              </ng-template>
             </div>
           </div>
 
         </div>
-
       </div>
     </div>
+  </div>
+</div>
+
+<div class="modal-overlay" *ngIf="mostrarModalHistorial">
+  <div class="modal-card fade-in">
+    <div class="modal-header">
+      <h2>Nuevo Registro Clínico</h2>
+      <button class="btn-close" (click)="cerrarModalRegistro()">×</button>
+    </div>
+    
+    <form class="modal-body" (ngSubmit)="guardarRegistro()">
+      <div class="form-row">
+        <div class="form-group-modal">
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="nuevoRegistro.fecha" name="fecha" class="edit-input" required>
+        </div>
+        <div class="form-group-modal">
+          <label>Veterinario</label>
+          <input type="text" [(ngModel)]="nuevoRegistro.veterinario" name="veterinario/a" class="edit-input" placeholder="Ej: Dra. García" required>
+        </div>
+      </div>
+
+      <div class="form-group-modal">
+        <label>Motivo</label>
+        <input type="text" [(ngModel)]="nuevoRegistro.motivoConsulta" name="motivoConsulta" class="edit-input" placeholder="Ej: Control, Vacunación..." required>
+      </div>
+
+      <div class="form-group-modal">
+        <label>Diagnóstico</label>
+        <textarea [(ngModel)]="nuevoRegistro.diagnostico" name="diagnostico" class="edit-input" rows="2" required></textarea>
+      </div>
+
+      <div class="form-group-modal">
+        <label>Tratamiento Indicado</label>
+        <textarea [(ngModel)]="nuevoRegistro.tratamiento" name="tratamiento" class="edit-input" rows="2" required></textarea>
+      </div>
+
+      <div class="form-group-modal">
+        <label>Observaciones (Opcional)</label>
+        <textarea [(ngModel)]="nuevoRegistro.observaciones" name="observaciones" class="edit-input" rows="2"></textarea>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel-sm" (click)="cerrarModalRegistro()">Cancelar</button>
+        <button type="submit" class="btn-save">Guardar Registro</button>
+      </div>
+    </form>
   </div>
 </div>

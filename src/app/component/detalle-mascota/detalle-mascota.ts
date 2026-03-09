@@ -17,13 +17,24 @@ export class DetalleMascotaComponent implements OnInit {
   descripcionIA: string = '';
   cargandoIA: boolean = false;
   loading: boolean = true; 
-  apiUrl = 'https://localhost:7082/api/Mascotas';
+  apiUrl = 'https://backend-hmz6.onrender.com/api/Mascotas';
   plan: any[] = [];
   editando: boolean = false;
   cargandoGuardar: boolean = false;
   vacunaEditando: any = null; 
   guardandoVacuna: boolean = false;
   proximosTurnos: any[] = [];
+
+  historial: any[] = [];
+  mostrarModalHistorial: boolean = false;
+  nuevoRegistro = {
+    fecha: new Date().toISOString().split('T')[0],
+    veterinario: '',
+    motivoConsulta: '',
+    diagnostico: '',
+    tratamiento: '',
+    observaciones: ''
+  };
 
   constructor(
     private route: ActivatedRoute,
@@ -56,6 +67,7 @@ obtenerDatosMascota(id: number) {
       if (this.mascota && this.mascota.nombre) {
         this.generarBio();
         this.cargarTurnos();
+        this.cargarHistorial(id);
       }
       this.cdr.detectChanges();
     },
@@ -66,7 +78,7 @@ obtenerDatosMascota(id: number) {
   });
 }
 cargarTurnos() {
-  this.http.get<any[]>('https://localhost:7082/api/turnos').subscribe({
+  this.http.get<any[]>('https://backend-hmz6.onrender.com/api/turnos').subscribe({
     next: (data) => {
       const ahora = new Date();
       this.proximosTurnos = data
@@ -147,6 +159,38 @@ cargarTurnos() {
         this.guardandoVacuna = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  cargarHistorial(id: number) {
+    this.service.getHistorial(id).subscribe({
+      next: (data) => {
+        this.historial = data;
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error("Error al cargar historial", err)
+    });
+  }
+
+  abrirModalNuevoRegistro() {
+    this.mostrarModalHistorial = true;
+  }
+
+  cerrarModalRegistro() {
+    this.mostrarModalHistorial = false;
+    this.nuevoRegistro = { fecha: new Date().toISOString().split('T')[0], veterinario: '', motivoConsulta: '', diagnostico: '', tratamiento: '', observaciones: '' };
+  }
+
+  guardarRegistro() {
+    if (!this.mascota) return;
+    
+    this.service.agregarHistorial(this.mascota.id, this.nuevoRegistro).subscribe({
+      next: (res) => {
+        this.historial.unshift(res); 
+        this.cerrarModalRegistro();
+        this.cdr.detectChanges();
+      },
+      error: (err) => console.error("Error al guardar el registro médico", err)
     });
   }
 }

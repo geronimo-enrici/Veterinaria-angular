@@ -1,6 +1,4 @@
 <div class="app-container">
-
-
   <div class="content-wrapper">
     <section class="form-card">
       <h2>Nueva Mascota</h2>
@@ -36,20 +34,39 @@
 
     <section class="list-section">
       <h2>Pacientes Registrados</h2>
-      <div class="grid-container">
-        <div class="pet-card" *ngFor="let mascota of paginatedMascotas" (click)="irAlDetalle(mascota.id)">
-          <div class="card-icon">🐶</div>
-          <div class="card-info">
-            <h3>{{ mascota.nombre }}</h3>
-            <span class="breed">{{ mascota.raza }}</span>
-            <div class="details">
-              <span><strong>Dueño:</strong> {{ mascota.dueno ? mascota.dueno.nombre : 'Sin asignar' }}</span>
-            </div>
-          </div>
-        </div>
+      
+      <div class="search-container">
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="🔍 Buscar por nombre, raza o dueño..." 
+          [(ngModel)]="searchTerm" 
+          (ngModelChange)="onSearchChange()"
+        >
       </div>
 
-      <div class="pagination" *ngIf="mascotas.length > itemsPerPage">
+      <div class="grid-container">
+        <ng-container *ngFor="let mascota of paginatedMascotas">
+          
+          <div class="pet-card" *ngIf="!mascota.isPlaceholder; else emptySlot" (click)="irAlDetalle(mascota.id)">
+            <div class="card-icon">🐶</div>
+            <div class="card-info">
+              <h3>{{ mascota.nombre }}</h3>
+              <span class="breed">{{ mascota.raza }}</span>
+              <div class="details">
+                <span><strong>Dueño:</strong> {{ mascota.dueno ? mascota.dueno.nombre : 'Sin asignar' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #emptySlot>
+            <div class="pet-card placeholder"></div>
+          </ng-template>
+
+        </ng-container>
+      </div>
+
+      <div class="pagination" *ngIf="totalPages > 1">
         <button (click)="currentPage = currentPage - 1" [disabled]="currentPage === 1">Anterior</button>
         <span>Página {{ currentPage }} de {{ totalPages }}</span>
         <button (click)="currentPage = currentPage + 1" [disabled]="currentPage >= totalPages">Siguiente</button>

@@ -15,41 +15,46 @@
     </nav>
 
     <div class="header-auth">
-      <button class="menu-toggle" (click)="toggleMenu()">
+      <div class="desktop-only" *ngIf="estaLogueado">
+        <span class="badge-admin" *ngIf="esAdmin">Admin</span>
+        <button class="btn-logout" (click)="cerrarSesion()">Salir</button>
+      </div>
+      <button class="btn-login desktop-only" *ngIf="!estaLogueado" (click)="abrirLogin()">Ingresar</button>
+
+      <button class="menu-toggle" (click)="toggleMenu()" [class.active]="menuAbierto">
         <span></span>
         <span></span>
         <span></span>
       </button>
-
-      <div class="auth-desktop desktop-only">
-        <button class="btn-login" *ngIf="!estaLogueado" (click)="abrirLogin()">Ingresar</button>
-        <div class="user-info" *ngIf="estaLogueado">
-          <span class="badge-admin" *ngIf="esAdmin">Admin</span>
-          <button class="btn-logout" (click)="cerrarSesion()">Salir</button>
-        </div>
-      </div>
     </div>
   </div>
 
-  <div class="mobile-menu-modal" [class.is-open]="menuAbierto">
-    <div class="modal-nav-content">
-      <button class="btn-close-menu" (click)="toggleMenu()">×</button>
-      
-      <nav class="mobile-nav">
-        <ul (click)="toggleMenu()"> <li><a routerLink="/mascotas" routerLinkActive="active">Mascotas</a></li>
-          <li><a routerLink="/duenos" routerLinkActive="active">Clientes</a></li>
-          <li><a routerLink="/productos" routerLinkActive="active">Productos</a></li>
-          <li><a routerLink="/turnos" routerLinkActive="active">Turnos</a></li>
-        </ul>
-      </nav>
+<div class="mobile-menu-modal" [class.is-open]="menuAbierto">
+  <div class="modal-nav-content">
+    <div class="logo" routerLink="/" (click)="toggleMenu()">
+      <span class="icon">🐾</span>
+      <h1>Veterinaria<span>App</span></h1>
+    </div>
 
-      <div class="mobile-auth">
-        <button class="btn-login-mobile" *ngIf="!estaLogueado" (click)="abrirLogin(); toggleMenu()">Ingresar</button>
-        <div class="user-info-mobile" *ngIf="estaLogueado">
-          <span class="badge-admin">Admin</span>
-          <button class="btn-logout" (click)="cerrarSesion(); toggleMenu()">Cerrar Sesión</button>
-        </div>
+    <nav class="mobile-nav">
+      <ul (click)="toggleMenu()">
+        <li><a routerLink="/mascotas" routerLinkActive="active">Mascotas</a></li>
+        <li><a routerLink="/duenos" routerLinkActive="active">Clientes</a></li>
+        <li><a routerLink="/productos" routerLinkActive="active">Productos</a></li>
+        <li><a routerLink="/turnos" routerLinkActive="active">Turnos</a></li>
+      </ul>
+    </nav>
+
+    <div class="mobile-auth">
+      <button class="btn-login-mobile" *ngIf="!estaLogueado" (click)="abrirLogin()">Ingresar</button>
+      <div class="user-info-mobile" *ngIf="estaLogueado">
+        <span class="badge-admin" *ngIf="esAdmin">Admin</span>
+        <button class="btn-logout-mobile" (click)="cerrarSesion()">Cerrar Sesión</button>
+      </div>
+      <div class="footer-menu">
+        © 2026 Veterinaria App v1.0
       </div>
     </div>
   </div>
+</div>
 </header>

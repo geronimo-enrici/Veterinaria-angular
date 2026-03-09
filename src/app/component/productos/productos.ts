@@ -52,7 +52,7 @@ export class Productos implements OnInit {
     icono: '📦'
   };
   
-  private apiUrl = 'https://localhost:7082/api';
+  private apiUrl = 'https://backend-hmz6.onrender.com/api';
 
   constructor(
     private http: HttpClient,

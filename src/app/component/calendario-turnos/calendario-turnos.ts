@@ -66,7 +66,7 @@ export class CalendarioTurnos implements OnInit {
   }
 
   cargarMascotas(): void {
-    this.http.get<any[]>('https://localhost:7082/api/mascotas').subscribe({
+    this.http.get<any[]>('https://backend-hmz6.onrender.com/api/mascotas').subscribe({
       next: (data) => {
         this.mascotasBD = data;
         this.cdr.detectChanges();
@@ -75,7 +75,7 @@ export class CalendarioTurnos implements OnInit {
   }
 
 cargarTurnos() {
-    this.http.get<any[]>('https://localhost:7082/api/turnos').subscribe(data => {
+    this.http.get<any[]>('https://backend-hmz6.onrender.com/api/turnos').subscribe(data => {
       
       const configTipos: { [key: string]: { duracionMs: number, color: string } } = {
         'Veterinaria': { duracionMs: 3600000, color: '#3788d8' }, 
@@ -156,7 +156,7 @@ cargarTurnos() {
   eliminarTurno(): void {
     if (!this.turnoSeleccionado) return;
 
-    this.http.delete(`https://localhost:7082/api/turnos/${this.turnoSeleccionado.id}`).subscribe({
+    this.http.delete(`https://backend-hmz6.onrender.com/api/turnos/${this.turnoSeleccionado.id}`).subscribe({
       next: () => {
         this.turnoSeleccionado = null;
         this.cargarTurnos();

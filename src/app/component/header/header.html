@@ -1,8 +1,9 @@
 <header class="main-header">
   <div class="header-content">
-    <div class="logo" routerLink="/">
-      <span class="icon">🐾</span>
-      <h1>Ve<span>los</span></h1>
+    <div class="logo" routerLink="/" (click)="toggleMenu()">
+      <img src="../../../assets/logo-vetexa.png" alt="Logo VetExa" class="logo-img">
+  
+      <h1>Vet<span>Exa</span></h1>
     </div>
     
     <nav class="main-nav desktop-only">
@@ -32,8 +33,9 @@
 <div class="mobile-menu-modal" [class.is-open]="menuAbierto">
   <div class="modal-nav-content">
     <div class="logo" routerLink="/" (click)="toggleMenu()">
-      <span class="icon">🐾</span>
-      <h1>Ve<span>los</span></h1>
+      <img src="../../../assets/logo-vetexa.png" alt="Logo VetExa" class="logo-img">
+  
+      <h1>Vet<span>Exa</span></h1>
     </div>
 
     <nav class="mobile-nav">

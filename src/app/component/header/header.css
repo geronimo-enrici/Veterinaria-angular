@@ -52,8 +52,10 @@
   letter-spacing: -0.025em;
 }
 
-.logo span {
-  color: var(--accent-color);
+.logo-img {
+  width: 40px;  
+  height: auto; 
+  object-fit: contain;
 }
 
 .main-nav {
@@ -299,7 +301,7 @@
     height: 100%;
     box-sizing: border-box;
     background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
-    background-size: 20px 20px; /* Patrón sutil de puntos para el fondo */
+    background-size: 20px 20px;
   }
 
   .modal-nav-content > .logo {

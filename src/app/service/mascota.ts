@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class MascotasService {
-  private apiUrl = 'https://localhost:7082/api/mascotas'; 
+  private apiUrl = 'https://backend-hmz6.onrender.com/api/mascotas'; 
 
   constructor(private http: HttpClient) { }
 
@@ -23,7 +23,7 @@ export class MascotasService {
   }
 
   getDescripcionIA(nombre: string, raza: string): Observable<any> {
-    const url = `https://localhost:7082/api/mascotas/generar-descripcion`;
+    const url = `https://backend-hmz6.onrender.com/api/mascotas/generar-descripcion`;
     return this.http.get(`${url}?nombre=${nombre}&raza=${raza}`);
   }
 updateMascota(id: number, mascota: any): Observable<any> {
@@ -34,6 +34,6 @@ actualizarVacuna(idMascota: number, idVacuna: number, datos: any): Observable<an
   return this.http.put(`${this.apiUrl}/${idMascota}/vacunas/${idVacuna}`, datos);
 }
 getDuenoDetalle(id: number): Observable<any> {
-  return this.http.get(`https://localhost:7082/api/Duenos/${id}`);
+  return this.http.get(`https://backend-hmz6.onrender.com/api/Duenos/${id}`);
 }
 }

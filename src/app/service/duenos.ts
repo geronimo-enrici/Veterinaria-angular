@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DuenosService {
-  private apiUrl = 'https://localhost:7082/api/duenos'; 
+  private apiUrl = 'https://backend-hmz6.onrender.com/api/duenos'; 
 
   constructor(private http: HttpClient) { }
 

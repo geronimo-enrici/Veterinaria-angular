@@ -12,31 +12,37 @@ import { RouterModule } from '@angular/router';
 export class Header implements OnInit {
   estaLogueado = false;
   esAdmin = false;
+  menuAbierto = false; 
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
   ngOnInit() {
-    console.log('[Header] Inicializando componente');
     this.verificarSesion();
+  }
+
+  toggleMenu() {
+    this.menuAbierto = !this.menuAbierto;
+    
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.style.overflow = this.menuAbierto ? 'hidden' : 'auto';
+    }
   }
 
   verificarSesion() {
     if (isPlatformBrowser(this.platformId)) {
       this.estaLogueado = !!localStorage.getItem('token');
       this.esAdmin = localStorage.getItem('rol') === 'Admin';
-      console.log('[Header] Estado de sesión:', { logueado: this.estaLogueado, admin: this.esAdmin });
     }
   }
 
   abrirLogin() {
-    console.log('[Header] Emitiendo evento "abrir-login"');
     if (isPlatformBrowser(this.platformId)) {
       window.dispatchEvent(new CustomEvent('abrir-login'));
+      if (this.menuAbierto) this.toggleMenu(); 
     }
   }
 
   cerrarSesion() {
-    console.log('[Header] Cerrando sesión y limpiando localStorage');
     if (isPlatformBrowser(this.platformId)) {
       localStorage.clear();
       window.location.reload();

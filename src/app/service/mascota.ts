@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class MascotasService {
-  private apiUrl = 'https://localhost:7082/api/mascotas'; 
+  private apiUrl = 'https://backend-hmz6.onrender.com/api/mascotas'; 
 
   constructor(private http: HttpClient) { }
 

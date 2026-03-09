@@ -13,7 +13,7 @@ export interface Turno {
   providedIn: 'root'
 })
 export class TurnosService {
-  private apiUrl = 'https://localhost:7082/api/turnos'
+  private apiUrl = 'https://backend-hmz6.onrender.com/api/turnos'
 
   constructor(private http: HttpClient) { }
 
